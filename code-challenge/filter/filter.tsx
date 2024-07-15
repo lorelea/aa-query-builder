@@ -15,11 +15,13 @@ type State = Record<string, City>;
 type Country = Record<string, State>;
 type FoldedData = Record<string, Country>;
 
-type UseDataProps = {
+type FilterProps = {
   country: string;
   state: string;
   city: string;
 };
+
+const INIT_FILTER = { country: "", state: "", city: "" };
 
 function foldData(data: Data[]): FoldedData {
   return data.reduce(
@@ -44,7 +46,7 @@ function foldData(data: Data[]): FoldedData {
 
 // example fetch request for data
 // fetch('/api/data')
-const useData = ({ country, state, city }: UseDataProps) => {
+const useData = ({ country, state, city }: FilterProps) => {
   const [data, setData] = useState<FoldedData>({});
 
   const fetchData = useCallback(() => {
@@ -65,15 +67,7 @@ const useData = ({ country, state, city }: UseDataProps) => {
       return [];
     }
 
-    const selectedCountry = country
-      ? data[country]
-      : Object.values(data).reduce(
-          (obj, countryObj) => ({ ...obj, ...countryObj }),
-          {}
-        );
-    if (!selectedCountry) {
-      return [];
-    }
+    const selectedCountry = country ? data[country] : {};
 
     const selectedState = state
       ? selectedCountry[state]
@@ -81,9 +75,6 @@ const useData = ({ country, state, city }: UseDataProps) => {
           (obj, stateObj) => ({ ...obj, ...stateObj }),
           {}
         );
-    if (!selectedState) {
-      return [];
-    }
 
     const selectedCity = city
       ? selectedState[city]
@@ -92,14 +83,16 @@ const useData = ({ country, state, city }: UseDataProps) => {
     return selectedCity || [];
   }, [data, country, state, city]);
 
-  return filteredData;
+  const countryOptions = Object.keys(data);
+  const stateOptions = country ? Object.keys(data[country]) : [];
+  const cityOptions = state ? Object.keys(data[country][state]) : [];
+
+  return { data: filteredData, countryOptions, stateOptions, cityOptions };
 };
 
 export const Filter = () => {
-  const [country, setCountry] = useState(``);
-  const [state, setState] = useState(``);
-  const [city, setCity] = useState(``);
-  const data: string[] = useData({ country, state, city });
+  const [filter, setFilter] = useState(INIT_FILTER);
+  const { data, countryOptions, stateOptions, cityOptions } = useData(filter);
 
   return (
     <Panel title="Query Builder">
@@ -107,33 +100,39 @@ export const Filter = () => {
         <SelectControl
           label="Country"
           placeholder="Select..."
-          value={country}
-          options={["", "Canada"]}
-          onChange={(event) => setCountry(event.target.value)}
+          value={filter.country}
+          options={countryOptions}
+          onChange={(event) =>
+            setFilter({ ...INIT_FILTER, country: event.target.value })
+          }
         />
         <SelectControl
           label="State/Province"
           placeholder="Select..."
-          value={state}
-          options={["", "Ontario"]}
-          onChange={(event) => setState(event.target.value)}
+          value={filter.state}
+          options={stateOptions}
+          onChange={(event) =>
+            setFilter({
+              ...filter,
+              state: event.target.value,
+              city: INIT_FILTER.city,
+            })
+          }
         />
         <SelectControl
           label="City"
           placeholder="Select..."
-          value={city}
-          options={["", "Toronto"]}
-          onChange={(event) => setCity(event.target.value)}
+          value={filter.city}
+          options={cityOptions}
+          onChange={(event) =>
+            setFilter({ ...filter, city: event.target.value })
+          }
         />
         <p className={styles.label}>People</p>
         <ul>
           {data.map((person) => (
             <li key={person}>{person}</li>
           ))}
-          {/* <li>Annadiane Kelf</li>
-          <li>Cordi Skain</li>
-          <li>Hugh Cherm</li>
-          <li>Murielle Mudge</li> */}
         </ul>
       </form>
     </Panel>
