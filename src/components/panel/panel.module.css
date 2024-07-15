@@ -1,0 +1,35 @@
+.panel {
+  border: 1px solid #c3c3c3;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.4rem;
+  flex-wrap: nowrap;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fafafa;
+  border-bottom: 1px solid #eeeeee;
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: 4rem;
+  padding: 0 2rem;
+  border-top-right-radius: 0.4rem;
+  border-top-left-radius: 0.4rem;
+}
+
+.title {
+  color: #222222;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.body {
+  width: 488px;
+  padding: 24px;
+  flex-grow: 1;
+}

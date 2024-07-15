@@ -1,0 +1,16 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.label {
+  width: 175px;
+  display: inline-block;
+  vertical-align: middle;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+  margin: 0;
+}

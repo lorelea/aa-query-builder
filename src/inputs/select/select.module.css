@@ -1,0 +1,21 @@
+.select {
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 17px;
+  background-color: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 4px;
+  display: inline-block;
+  overflow: hidden;
+  border: 1px solid #bbb;
+  color: #777777;
+}
+
+.placeholder {
+  color: #999;
+}
+
+.placeholderOption {
+  display: none;
+}

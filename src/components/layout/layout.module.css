@@ -1,0 +1,14 @@
+.layout {
+  min-width: 100vw;
+  min-height: 100vh;
+  background: #ebedf0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inner {
+  min-height: 500px;
+  display: flex;
+  gap: 3rem;
+}
