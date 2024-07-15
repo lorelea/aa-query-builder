@@ -10,13 +10,18 @@ type Data = {
   person: string;
 };
 
+type City = string[];
+type State = Record<string, City>;
+type Country = Record<string, State>;
+type FoldedData = Record<string, Country>;
+
 type UseDataProps = {
   country: string;
   state: string;
   city: string;
 };
 
-function foldData(data: Data[]) {
+function foldData(data: Data[]): FoldedData {
   return data.reduce(
     (obj: Record<string, any>, { country, state, city, person }: Data) => {
       const countryObj = obj[country] || {};
@@ -40,7 +45,7 @@ function foldData(data: Data[]) {
 // example fetch request for data
 // fetch('/api/data')
 const useData = ({ country, state, city }: UseDataProps) => {
-  const [data, setData] = useState<Record<string, any>>({});
+  const [data, setData] = useState<FoldedData>({});
 
   const fetchData = useCallback(() => {
     fetch("/api/data")
@@ -56,9 +61,34 @@ const useData = ({ country, state, city }: UseDataProps) => {
   }, []);
 
   const filteredData = useMemo(() => {
-    const selectedCountry = country ? data[country] : null;
-    const selectedState = state ? selectedCountry[state] : null;
-    const selectedCity = city ? selectedState[city] : null;
+    if (!data || (!country && !state && !city)) {
+      return [];
+    }
+
+    const selectedCountry = country
+      ? data[country]
+      : Object.values(data).reduce(
+          (obj, countryObj) => ({ ...obj, ...countryObj }),
+          {}
+        );
+    if (!selectedCountry) {
+      return [];
+    }
+
+    const selectedState = state
+      ? selectedCountry[state]
+      : Object.values(selectedCountry).reduce(
+          (obj, stateObj) => ({ ...obj, ...stateObj }),
+          {}
+        );
+    if (!selectedState) {
+      return [];
+    }
+
+    const selectedCity = city
+      ? selectedState[city]
+      : Object.values(selectedState).flat();
+
     return selectedCity || [];
   }, [data, country, state, city]);
 
@@ -78,21 +108,21 @@ export const Filter = () => {
           label="Country"
           placeholder="Select..."
           value={country}
-          options={["Canada"]}
+          options={["", "Canada"]}
           onChange={(event) => setCountry(event.target.value)}
         />
         <SelectControl
           label="State/Province"
           placeholder="Select..."
           value={state}
-          options={["Ontario"]}
+          options={["", "Ontario"]}
           onChange={(event) => setState(event.target.value)}
         />
         <SelectControl
           label="City"
           placeholder="Select..."
           value={city}
-          options={["Toronto"]}
+          options={["", "Toronto"]}
           onChange={(event) => setCity(event.target.value)}
         />
         <p className={styles.label}>People</p>
